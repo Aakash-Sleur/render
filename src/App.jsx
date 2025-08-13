@@ -28,6 +28,11 @@ export default function App() {
         optionC: row["Option C"] || row["Option c"] || "",
         optionD: row["Option D"] || row["Option d"] || "",
         answers: row["Answers"] || row["Correct option"] || "",
+        qnType: row["Question Type"] || "",
+        topic: row["Topic"] || "",
+        chapter: row["Chapter"] || "",
+        subject: row["Subject"] || "",
+        exam: row["Exam"] || "",
       }));
 
       setQuestions(formattedData);
@@ -382,7 +387,7 @@ export default function App() {
         )}
       </div>
 
-      <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
         {questions.map((q, index) => (
           <div
             key={index}
@@ -396,6 +401,39 @@ export default function App() {
             }}
           >
             <div style={{ marginBottom: "20px" }}>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "#000000ff",
+                  fontFamily: "'Noto Sans', sans-serif",
+                  marginTop: "8px",
+                  display: "flex",
+                  gap: "18px",
+                  flexWrap: "wrap",
+                  marginBottom: "2rem",
+                }}
+              >
+                {q.topic && (
+                  <span>
+                    📚 <strong>Topic:</strong> {q.topic}
+                  </span>
+                )}
+                {q.chapter && (
+                  <span>
+                    📖 <strong>Chapter:</strong> {q.chapter}
+                  </span>
+                )}
+                {q.subject && (
+                  <span>
+                    📝 <strong>Subject:</strong> {q.subject}
+                  </span>
+                )}
+                {q.exam && (
+                  <span>
+                    🎓 <strong>Exam:</strong> {q.exam}
+                  </span>
+                )}
+              </div>
               <span
                 style={{
                   fontSize: "18px",
@@ -405,7 +443,7 @@ export default function App() {
                   fontFamily: "'Roboto', sans-serif",
                 }}
               >
-                {q.serialNumber || index+1}.
+                {q.serialNumber || index + 1}.
               </span>
               <span
                 style={{
