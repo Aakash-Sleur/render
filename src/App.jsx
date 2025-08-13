@@ -3,6 +3,19 @@ import * as XLSX from "xlsx";
 import { InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
 
+const subjectColors = {
+  Mathematics: "#1E88E5", // Blue
+  Physics: "#8E24AA", // Purple
+  Chemistry: "#F4511E", // Orange
+  Biology: "#43A047", // Green
+  English: "#FB8C00", // Amber
+  History: "#6D4C41", // Brown
+  Geography: "#00897B", // Teal
+  ComputerScience: "#3949AB", // Indigo
+  Economics: "#E53935", // Red
+  Default: "#546E7A", // Grey for unknown subjects
+};
+
 export default function App() {
   const [questions, setQuestions] = useState([]);
 
@@ -424,8 +437,22 @@ export default function App() {
                   </span>
                 )}
                 {q.subject && (
-                  <span>
-                    📝 <strong>Subject:</strong> {q.subject}
+                  <span
+                    style={{
+                      color: subjectColors[q.subject] || subjectColors.Default,
+                      fontWeight: 800,
+                    }}
+                  >
+                    📝 <strong>Subject:</strong>{" "}
+                    <span
+                      style={{
+                        color:
+                          subjectColors[q.subject] || subjectColors.Default,
+                        fontWeight: 800,
+                      }}
+                    >
+                      {q.subject}
+                    </span>
                   </span>
                 )}
                 {q.exam && (
