@@ -109,8 +109,72 @@ export default function App() {
       .replace(/\s*([=<>±×÷])\s*/g, " $1 ");
   };
 
+  const parseEnumerateList = (text) => {
+    // Check if text contains enumerate environment
+    const enumerateRegex = /\\begin\{enumerate\}(.*?)\\end\{enumerate\}/s;
+    const match = text.match(enumerateRegex);
+    
+    if (!match) return null;
+    
+    const [fullMatch, content] = match;
+    const beforeText = text.substring(0, match.index).trim();
+    const afterText = text.substring(match.index + fullMatch.length).trim();
+    
+    // Extract items from the enumerate content
+    const itemRegex = /\\item\s+(.*?)(?=\\item|$)/gs;
+    const items = [];
+    let itemMatch;
+    
+    while ((itemMatch = itemRegex.exec(content)) !== null) {
+      const itemContent = itemMatch[1].trim();
+      if (itemContent) {
+        items.push(itemContent);
+      }
+    }
+    
+    return {
+      beforeText,
+      afterText,
+      items,
+      fullMatch
+    };
+  };
+
   const renderWithLatexAndImages = (text) => {
     if (!text) return null;
+
+    // Check for enumerate list first
+    const enumerateData = parseEnumerateList(text);
+    if (enumerateData) {
+      return (
+        <div style={{ lineHeight: "1.6" }}>
+          {enumerateData.beforeText && (
+            <div style={{ marginBottom: "10px" }}>
+              {renderContent(enumerateData.beforeText)}
+            </div>
+          )}
+          <ol style={{ 
+            paddingLeft: "20px", 
+            marginBottom: "10px",
+            listStyleType: "decimal"
+          }}>
+            {enumerateData.items.map((item, index) => (
+              <li key={index} style={{ 
+                marginBottom: "8px",
+                lineHeight: "1.6"
+              }}>
+                {renderContent(item)}
+              </li>
+            ))}
+          </ol>
+          {enumerateData.afterText && (
+            <div style={{ marginTop: "10px" }}>
+              {renderContent(enumerateData.afterText)}
+            </div>
+          )}
+        </div>
+      );
+    }
 
     // First check for assertion-reason pattern
     const assertionReasonMatch = text.match(
