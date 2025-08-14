@@ -91,22 +91,25 @@ export default function App() {
   };
 
   const cleanLatexText = (text) => {
-    return text
-      .replace(/\{\[\}\s*([^{}]+?)\s*\{\]\}/g, "[$1]")
-      .replace(/([A-Za-z])\{\[\]\}/g, "[$1]")
-      .replace(/\{\[\}/g, "[")
-      .replace(/\{\]\}/g, "]")
-      .replace(/\\textgreater\{\}/g, ">")
-      .replace(/\\textless\{\}/g, "<")
-      .replace(/\\textdegree\{\}/g, "°")
-      .replace(/\s*\\,\s*/g, " ")
-      .replace(/\s*\\\s+/g, " ")
-      .replace(/\s+\\([a-zA-Z]+)/g, "\\$1")
-      .replace(/\\([a-zA-Z]+)\s+/g, "\\$1 ")
-      .replace(/\\\$/g, "$")
-      .replace(/\\\&/g, "&")
-      .replace(/\\\%/g, "%")
-      .replace(/\s*([=<>±×÷])\s*/g, " $1 ");
+    return (
+      text
+        .replace(/\{\[\}\s*([^{}]+?)\s*\{\]\}/g, "[$1]")
+        .replace(/([A-Za-z])\{\[\]\}/g, "[$1]")
+        .replace(/\{\[\}/g, "[")
+        .replace(/\{\]\}/g, "]")
+        .replace(/\\textgreater\{\}/g, ">")
+        .replace(/\\textless\{\}/g, "<")
+        .replace(/\\textdegree\{\}/g, "°")
+        .replace(/\s*\\,\s*/g, " ")
+        .replace(/\s*\\\s+/g, " ")
+        .replace(/\s+\\([a-zA-Z]+)/g, "\\$1")
+        .replace(/\\([a-zA-Z]+)\s+/g, "\\$1 ")
+        .replace(/\\\$/g, "$")
+        .replace(/\\\&/g, "&")
+        // .replace(/\\\%/g, "%")   // ❌ removed
+        .replace(/(?<!\\)%/g, "\\%")
+        .replace(/\s*([=<>±×÷])\s*/g, " $1 ")
+    );
   };
 
   const parseEnumerateList = (text) => {
