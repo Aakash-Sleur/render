@@ -113,30 +113,30 @@ export default function App() {
     // Check if text contains enumerate environment
     const enumerateRegex = /\\begin\{enumerate\}(.*?)\\end\{enumerate\}/s;
     const match = text.match(enumerateRegex);
-    
+
     if (!match) return null;
-    
+
     const [fullMatch, content] = match;
     const beforeText = text.substring(0, match.index).trim();
     const afterText = text.substring(match.index + fullMatch.length).trim();
-    
+
     // Extract items from the enumerate content
     const itemRegex = /\\item\s+(.*?)(?=\\item|$)/gs;
     const items = [];
     let itemMatch;
-    
+
     while ((itemMatch = itemRegex.exec(content)) !== null) {
       const itemContent = itemMatch[1].trim();
       if (itemContent) {
         items.push(itemContent);
       }
     }
-    
+
     return {
       beforeText,
       afterText,
       items,
-      fullMatch
+      fullMatch,
     };
   };
 
@@ -153,16 +153,21 @@ export default function App() {
               {renderContent(enumerateData.beforeText)}
             </div>
           )}
-          <ol style={{ 
-            paddingLeft: "20px", 
-            marginBottom: "10px",
-            listStyleType: "decimal"
-          }}>
+          <ol
+            style={{
+              paddingLeft: "20px",
+              marginBottom: "10px",
+              listStyleType: "decimal",
+            }}
+          >
             {enumerateData.items.map((item, index) => (
-              <li key={index} style={{ 
-                marginBottom: "8px",
-                lineHeight: "1.6"
-              }}>
+              <li
+                key={index}
+                style={{
+                  marginBottom: "8px",
+                  lineHeight: "1.6",
+                }}
+              >
                 {renderContent(item)}
               </li>
             ))}
@@ -617,6 +622,39 @@ export default function App() {
             </div>
           </div>
         ))}
+        <button
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            width: "50px",
+            height: "50px",
+            borderRadius: "50%",
+            backgroundColor: "#007bff",
+            border: "none",
+            color: "white",
+            fontSize: "18px",
+            cursor: "pointer",
+            boxShadow: "0 4px 8px rgba(0,123,255,0.3)",
+            transition: "all 0.3s ease",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => window.location.reload()}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = "#0056b3";
+            e.target.style.transform = "scale(1.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = "#007bff";
+            e.target.style.transform = "scale(1)";
+          }}
+          title="Reload Page"
+        >
+          🔄
+        </button>
       </div>
     </div>
   );
