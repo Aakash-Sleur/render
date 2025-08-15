@@ -107,12 +107,18 @@ export default function App() {
         .replace(/\\\$/g, "$")
         .replace(/\\\&/g, "&")
         // .replace(/\\\%/g, "%")   // ❌ removed
+        .replace(/\\\%/g, "%") // ✅ Convert escaped % back to normal %
         .replace(/(?<!\\)%/g, "\\%")
         .replace(/\s*([=<>±×÷])\s*/g, " $1 ")
     );
   };
 
   const parseEnumerateList = (text) => {
+    // Ensure text is a string
+    if (typeof text !== "string") {
+      return null;
+    }
+
     // Check if text contains enumerate environment
     const enumerateRegex = /\\begin\{enumerate\}(.*?)\\end\{enumerate\}/s;
     const match = text.match(enumerateRegex);
@@ -144,7 +150,10 @@ export default function App() {
   };
 
   const renderWithLatexAndImages = (text) => {
-    if (!text) return null;
+    // Add type checking at the beginning
+    if (!text || typeof text !== "string") {
+      return text || null;
+    }
 
     // Check for enumerate list first
     const enumerateData = parseEnumerateList(text);
@@ -216,6 +225,11 @@ export default function App() {
     return renderContent(preprocessedText);
 
     function renderContent(content) {
+      // Add type checking for content parameter
+      if (!content || typeof content !== "string") {
+        return content || null;
+      }
+
       let cleanedText = cleanLatexText(content);
 
       const patterns = [
