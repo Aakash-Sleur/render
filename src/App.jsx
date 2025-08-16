@@ -106,22 +106,29 @@ export default function App() {
         .replace(/\\([a-zA-Z]+)\s+/g, "\\$1 ")
         .replace(/\\\$/g, "$")
         .replace(/\\\&/g, "&")
-        // .replace(/\\\%/g, "%")   // ❌ removed
         .replace(/\\\%/g, "%") // ✅ Convert escaped % back to normal %
         .replace(/(?<!\\)%/g, "\\%")
         .replace(/\s*([=<>±×÷])\s*/g, " $1 ")
     );
   };
 
-  const parseEnumerateList = (text) => {
+  const parseListEnvironment = (text) => {
     // Ensure text is a string
     if (typeof text !== "string") {
       return null;
     }
 
-    // Check if text contains enumerate environment
+    // Check for both enumerate and itemize environments
     const enumerateRegex = /\\begin\{enumerate\}(.*?)\\end\{enumerate\}/s;
-    const match = text.match(enumerateRegex);
+    const itemizeRegex = /\\begin\{itemize\}(.*?)\\end\{itemize\}/s;
+    
+    let match = text.match(enumerateRegex);
+    let listType = "enumerate";
+    
+    if (!match) {
+      match = text.match(itemizeRegex);
+      listType = "itemize";
+    }
 
     if (!match) return null;
 
@@ -129,7 +136,7 @@ export default function App() {
     const beforeText = text.substring(0, match.index).trim();
     const afterText = text.substring(match.index + fullMatch.length).trim();
 
-    // Extract items from the enumerate content
+    // Extract items from the list content
     const itemRegex = /\\item\s+(.*?)(?=\\item|$)/gs;
     const items = [];
     let itemMatch;
@@ -146,6 +153,7 @@ export default function App() {
       afterText,
       items,
       fullMatch,
+      listType,
     };
   };
 
@@ -155,38 +163,60 @@ export default function App() {
       return text || null;
     }
 
-    // Check for enumerate list first
-    const enumerateData = parseEnumerateList(text);
-    if (enumerateData) {
+    // Check for list environments first (both enumerate and itemize)
+    const listData = parseListEnvironment(text);
+    if (listData) {
       return (
         <div style={{ lineHeight: "1.6" }}>
-          {enumerateData.beforeText && (
+          {listData.beforeText && (
             <div style={{ marginBottom: "10px" }}>
-              {renderContent(enumerateData.beforeText)}
+              {renderContent(listData.beforeText)}
             </div>
           )}
-          <ol
-            style={{
-              paddingLeft: "20px",
-              marginBottom: "10px",
-              listStyleType: "decimal",
-            }}
-          >
-            {enumerateData.items.map((item, index) => (
-              <li
-                key={index}
-                style={{
-                  marginBottom: "8px",
-                  lineHeight: "1.6",
-                }}
-              >
-                {renderContent(item)}
-              </li>
-            ))}
-          </ol>
-          {enumerateData.afterText && (
+          {listData.listType === "enumerate" ? (
+            <ol
+              style={{
+                paddingLeft: "20px",
+                marginBottom: "10px",
+                listStyleType: "decimal",
+              }}
+            >
+              {listData.items.map((item, index) => (
+                <li
+                  key={index}
+                  style={{
+                    marginBottom: "8px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  {renderContent(item)}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <ul
+              style={{
+                paddingLeft: "20px",
+                marginBottom: "10px",
+                listStyleType: "disc",
+              }}
+            >
+              {listData.items.map((item, index) => (
+                <li
+                  key={index}
+                  style={{
+                    marginBottom: "8px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  {renderContent(item)}
+                </li>
+              ))}
+            </ul>
+          )}
+          {listData.afterText && (
             <div style={{ marginTop: "10px" }}>
-              {renderContent(enumerateData.afterText)}
+              {renderContent(listData.afterText)}
             </div>
           )}
         </div>
