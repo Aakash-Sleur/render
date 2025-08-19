@@ -91,26 +91,26 @@ export default function App() {
   };
 
   const cleanLatexText = (text) => {
-    return (
-      text
-        .replace(/\{\[\}\s*([^{}]+?)\s*\{\]\}/g, "[$1]")
-        .replace(/([A-Za-z])\{\[\]\}/g, "[$1]")
-        .replace(/\{\[\}/g, "[")
-        .replace(/\{\]\}/g, "]")
-        .replace(/\\textgreater\{\}/g, ">")
-        .replace(/\\textless\{\}/g, "<")
-        .replace(/\\textdegree\{\}/g, "°")
-        .replace(/\s*\\,\s*/g, " ")
-        .replace(/\s*\\\s+/g, " ")
-        .replace(/\s+\\([a-zA-Z]+)/g, "\\$1")
-        .replace(/\\([a-zA-Z]+)\s+/g, "\\$1 ")
-        .replace(/\\\$/g, "$")
-        .replace(/\\\&/g, "&")
-        .replace(/\\\%/g, "%") // ✅ Convert escaped % back to normal %
-        .replace(/(?<!\\)%/g, "\\%")
-        .replace(/\s*([=<>±×÷])\s*/g, " $1 ")
-    );
+    return text
+      .replace(/\{\[\}\s*([^{}]+?)\s*\{\]\}/g, "[$1]")
+      .replace(/([A-Za-z])\{\[\]\}/g, "[$1]")
+      .replace(/\{\[\}/g, "[")
+      .replace(/\{\]\}/g, "]")
+      .replace(/\\textgreater\{\}/g, ">")
+      .replace(/\\textless\{\}/g, "<")
+      .replace(/\\textdegree\{\}/g, "°")
+      .replace(/\s*\\,\s*/g, " ")
+      .replace(/\s*\\\s+/g, " ")
+      .replace(/\s+\\([a-zA-Z]+)/g, "\\$1")
+      .replace(/\\([a-zA-Z]+)\s+/g, "\\$1 ")
+      .replace(/\\\$/g, "$")
+      .replace(/\\\&/g, "&")
+      .replace(/\\\%/g, "%") // ✅ Convert escaped % back to normal %
+      .replace(/(?<!\\)%/g, "\\%")
+      .replace(/\s*([=<>±×÷])\s*/g, " $1 ");
   };
+
+  // ...existing code...
 
   const parseListEnvironment = (text) => {
     // Ensure text is a string
@@ -121,13 +121,37 @@ export default function App() {
     // Check for both enumerate and itemize environments
     const enumerateRegex = /\\begin\{enumerate\}(.*?)\\end\{enumerate\}/s;
     const itemizeRegex = /\\begin\{itemize\}(.*?)\\end\{itemize\}/s;
-    
+
     let match = text.match(enumerateRegex);
     let listType = "enumerate";
-    
+
     if (!match) {
       match = text.match(itemizeRegex);
       listType = "itemize";
+    }
+
+    // NEW: Handle orphan \item blocks (no environment)
+    if (!match && /\\item\s+/.test(text)) {
+      // Find all items
+      const itemRegex = /\\item\s+(.*?)(?=(\\item|$))/gs;
+      const items = [];
+      let itemMatch;
+      let lastIndex = 0;
+      while ((itemMatch = itemRegex.exec(text)) !== null) {
+        items.push(itemMatch[1].trim());
+        lastIndex = itemRegex.lastIndex;
+      }
+      // Text before first item
+      const beforeText = text.slice(0, text.indexOf("\\item")).trim();
+      // Text after last item
+      const afterText = text.slice(lastIndex).trim();
+      return {
+        beforeText,
+        afterText,
+        items,
+        fullMatch: null,
+        listType: "enumerate", // Default to ordered list
+      };
     }
 
     if (!match) return null;
@@ -156,6 +180,8 @@ export default function App() {
       listType,
     };
   };
+
+  // ...existing code...
 
   const renderWithLatexAndImages = (text) => {
     // Add type checking at the beginning
