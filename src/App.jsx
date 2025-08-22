@@ -248,27 +248,6 @@ export default function App() {
       );
     }
 
-    // First check for assertion-reason pattern
-    const assertionReasonMatch = text.match(
-      /^(.+?Assertion(?:\(A\))?[:\s]+(.+?))\s+(.+?Reason(?:\(R\))?[:\s]+(.+?))$/i
-    );
-    if (assertionReasonMatch) {
-      const [_, assertionFull, assertionContent, reasonContent] =
-        assertionReasonMatch;
-      return (
-        <div style={{ lineHeight: "1.6" }}>
-          <div>
-            <strong>Assertion: </strong>
-            {renderContent(assertionContent)}
-          </div>
-          <div style={{ marginTop: "8px" }}>
-            <strong>Reason: </strong>
-            {renderContent(reasonContent)}
-          </div>
-        </div>
-      );
-    }
-
     // Handle LaTeX underline pattern: \_\_\_\_\_\_\_
     // Replace sequences of 3 or more underscores with an underlined blank
     let preprocessedText = text.replace(/\\_{1,}/g, (match) => {
