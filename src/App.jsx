@@ -181,7 +181,6 @@ export default function App() {
     };
   };
 
-  // ...existing code...
 
   const renderWithLatexAndImages = (text) => {
     // Add type checking at the beginning
@@ -600,6 +599,11 @@ export default function App() {
                 {q.exam && (
                   <span>
                     🎓 <strong>Exam:</strong> {q.exam}
+                  </span>
+                )}
+                {q.qnType && (
+                  <span>
+                    🎯 <strong>Question Type:</strong> {q.qnType}
                   </span>
                 )}
               </div>
