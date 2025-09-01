@@ -338,6 +338,8 @@ export default function ExcelViewer() {
           }
 
           parts.push({ type: "image", value: imgUrl });
+        } else if (fullMatch.startsWith("$$") || fullMatch.startsWith("\\[")) {
+          parts.push({ type: "block-latex", value: content.trim() });
         } else if (fullMatch.startsWith("$") || fullMatch.startsWith("\\(")) {
           parts.push({ type: "latex", value: content.trim() });
         } else if (fullMatch.startsWith("|") && isLikelyLatex(content.trim())) {
@@ -393,6 +395,12 @@ export default function ExcelViewer() {
                   e.target.parentElement.innerHTML = `<span style="color: red; font-style: italic;">[Image failed to load: ${part.value}]</span>`;
                 }}
               />
+            </div>
+          );
+        } else if (part.type === "block-latex") {
+          return (
+            <div key={i} style={{ margin: "8px 0" }}>
+              <BlockMath math={part.value} />
             </div>
           );
         } else if (part.type === "latex") {
