@@ -76,6 +76,7 @@ const ExcelUploader = () => {
         exam: row["Exam"] || "",
       }));
 
+      console.log(formattedData);
       setParsedData(formattedData);
       setStatus("success");
       setMessage(
@@ -114,12 +115,12 @@ const ExcelUploader = () => {
         // detect type (explicit in sheet or infer)
         let qType = row["qnType"]?.trim() || "";
         if (!qType) {
-          qType = row["optionA"] || row["optionA"] ? "MCQ" : "Numerical";
+          qType = row["optionA"] || row["optionA"] ? "MCQ" : "Numerical type";
         }
 
-        // build options only if not numerical
+        // build options only if not Numerical type
         let options = [];
-        if (qType !== "Numerical") {
+        if (qType !== "Numerical type") {
           if (row["optionA"] || row["optionA"])
             options.push({ text: row["optionA"] || row["optionA"] });
           if (row["optionB"] || row["optionB"])
@@ -133,7 +134,7 @@ const ExcelUploader = () => {
         // resolve correct answer
         let correctAnswer = row["answers"] || row["Correct option"] || "";
         if (
-          qType !== "Numerical" &&
+          qType !== "Numerical type" &&
           ["A", "B", "C", "D"].includes(correctAnswer.toUpperCase())
         ) {
           const idx = correctAnswer.toUpperCase().charCodeAt(0) - 65; // A=0, B=1, etc.
@@ -154,7 +155,7 @@ const ExcelUploader = () => {
           type: qType,
         };
       });
-      console.log(parsedData, "parsedData")
+      console.log(parsedData, "parsedData");
       console.log(processedData, "processedData");
 
       const response = await fetch(uploadUrl, {
@@ -208,18 +209,18 @@ const ExcelUploader = () => {
   };
 
   const isFieldMissing = (value) => {
-    return !value || value.toString().trim() === "";
+    return !value || value?.toString()?.trim() === "";
   };
 
   const getRowCompleteness = (item) => {
-    const requiredFields = [
-      "question",
-      "optionA",
-      "optionB",
-      "optionC",
-      "optionD",
-      "answers",
-    ];
+    // base required fields
+    let requiredFields = ["question", "answers"];
+
+    // add options only if it's not Numerical type
+    if (item.qnType !== "Numerical type") {
+      requiredFields.push("optionA", "optionB", "optionC", "optionD");
+    }
+
     const missingRequired = requiredFields.filter((field) =>
       isFieldMissing(item[field])
     );
@@ -573,7 +574,7 @@ const ExcelUploader = () => {
             </div>
             <div className="bg-white p-3 rounded-lg border">
               <div className="text-2xl font-bold text-purple-600">
-                {parsedData.filter((q) => q.answers.trim()).length}
+                {parsedData.filter((q) => q?.answers?.toString().trim()).length}
               </div>
               <div className="text-sm text-gray-600">With Answers</div>
             </div>
@@ -581,7 +582,7 @@ const ExcelUploader = () => {
               <div className="text-2xl font-bold text-orange-600">
                 {
                   new Set(
-                    parsedData.map((q) => q.subject).filter((s) => s.trim())
+                    parsedData.map((q) => q.subject).filter((s) => s?.trim())
                   ).size
                 }
               </div>
@@ -824,7 +825,7 @@ const ExcelUploader = () => {
                 | Subjects:{" "}
                 {
                   new Set(
-                    parsedData.map((q) => q.subject).filter((s) => s.trim())
+                    parsedData.map((q) => q.subject).filter((s) => s?.trim())
                   ).size
                 }{" "}
                 | Question Types: {Object.keys(questionTypeCounts).length}
@@ -991,7 +992,7 @@ const ExcelUploader = () => {
           onClick={uploadData}
           disabled={
             parsedData.length === 0 ||
-            !uploadUrl.trim() ||
+            !uploadUrl?.trim() ||
             status === "uploading"
           }
           className="w-full bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
