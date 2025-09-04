@@ -133,20 +133,33 @@ const ExcelUploader = () => {
 
         // resolve correct answer
         let correctAnswer = row["answers"] || row["Correct option"] || "";
-        if (
-          qType !== "Numerical type" &&
-          ["A", "B", "C", "D"].includes(correctAnswer.toUpperCase())
-        ) {
+
+        // Fixed logic for correct answer processing
+        if (qType === "Numerical type") {
+          // For numerical type, keep the answer as is
+          correctAnswer = correctAnswer?.toString() || "";
+        } else if (["A", "B", "C", "D"].includes(correctAnswer.toUpperCase())) {
+          // For MCQ type with letter answers, convert to option text
           const idx = correctAnswer.toUpperCase().charCodeAt(0) - 65; // A=0, B=1, etc.
           if (options[idx]) {
             correctAnswer = options[idx].text;
+          }
+        } else {
+          // For other cases, remove the first 3 characters if present (likely "A) ", "B) ", etc.)
+          correctAnswer = correctAnswer?.toString();
+          if (
+            correctAnswer &&
+            correctAnswer.length > 3 &&
+            /^[A-D]\)\s/.test(correctAnswer)
+          ) {
+            correctAnswer = correctAnswer.slice(3);
           }
         }
 
         return {
           question: row["question"] || "",
           options,
-          correctAnswer: correctAnswer?.toString().slice(3) || "",
+          correctAnswer: correctAnswer || "",
           explanation: row["explanation"] || "",
           topic: row["topic"] || "",
           chapter: row["chapter"] || "",
