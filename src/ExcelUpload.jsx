@@ -152,7 +152,7 @@ const ExcelUploader = () => {
             correctAnswer.length > 3 &&
             /^[A-D]\)\s/.test(correctAnswer)
           ) {
-            correctAnswer = correctAnswer.slice(3);
+            correctAnswer = correctAnswer.slice(2).trim();
           }
         }
 
