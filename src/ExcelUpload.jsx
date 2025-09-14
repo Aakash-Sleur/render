@@ -174,18 +174,18 @@ const ExcelUploader = () => {
 
       console.log(questionTypeCounts, "questionTypeCounts");
 
-      // const response = await fetch(uploadUrl, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     questions: processedData,
-      //     totalQuestions: parsedData.length,
-      //     questionTypeCounts: questionTypeCounts,
-      //     timestamp: new Date().toISOString(),
-      //   }),
-      // });
+      const response = await fetch(uploadUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          questions: processedData,
+          totalQuestions: parsedData.length,
+          questionTypeCounts: questionTypeCounts,
+          timestamp: new Date().toISOString(),
+        }),
+      });
 
       clearInterval(progressInterval);
       setProgress(100);
