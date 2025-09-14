@@ -28,7 +28,8 @@ const ExcelUploader = () => {
   const questionTypeCounts = useMemo(() => {
     const counts = {};
     parsedData.forEach((item) => {
-      const questionType = item.qnType?.trim() || "Not Specified";
+      let questionType = item.qnType?.trim() || "Not Specified";
+      if (questionType === "Numerical") questionType = "Numerical type";
       counts[questionType] = (counts[questionType] || 0) + 1;
     });
     return counts;
@@ -120,7 +121,7 @@ const ExcelUploader = () => {
 
         // build options only if not Numerical type
         let options = [];
-        if (qType !== "Numerical type") {
+        if (qType !== "Numerical type" && qType !== "Numerical") {
           if (row["optionA"] || row["optionA"])
             options.push({ text: row["optionA"] || row["optionA"] });
           if (row["optionB"] || row["optionB"])
@@ -135,7 +136,7 @@ const ExcelUploader = () => {
         let correctAnswer = row["answers"] || row["Correct option"] || "";
 
         // Fixed logic for correct answer processing
-        if (qType === "Numerical type") {
+        if (qType === "Numerical type" || "Numerical") {
           // For numerical type, keep the answer as is
           correctAnswer = correctAnswer?.toString() || "";
         } else if (["A", "B", "C", "D"].includes(correctAnswer.toUpperCase())) {
@@ -165,24 +166,26 @@ const ExcelUploader = () => {
           chapter: row["chapter"] || "",
           subject: row["subject"] || "",
           exam: row["exam"] || "",
-          type: qType,
+          type: qType === "Numerical" ? "Numerical type" : qType,
         };
       });
       console.log(parsedData, "parsedData");
       console.log(processedData, "processedData");
 
-      const response = await fetch(uploadUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          questions: processedData,
-          totalQuestions: parsedData.length,
-          questionTypeCounts: questionTypeCounts,
-          timestamp: new Date().toISOString(),
-        }),
-      });
+      console.log(questionTypeCounts, "questionTypeCounts");
+
+      // const response = await fetch(uploadUrl, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     questions: processedData,
+      //     totalQuestions: parsedData.length,
+      //     questionTypeCounts: questionTypeCounts,
+      //     timestamp: new Date().toISOString(),
+      //   }),
+      // });
 
       clearInterval(progressInterval);
       setProgress(100);
